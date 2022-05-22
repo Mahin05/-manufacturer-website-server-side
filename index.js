@@ -21,7 +21,7 @@ async function run() {
         app.get('/tools', async (req, res) => {
             const query = {};
             const cursor = toolsCollection.find(query);
-            const tools = await cursor.toArray();
+            const tools = await cursor.limit(6).toArray();
             res.send(tools);
         });
 
