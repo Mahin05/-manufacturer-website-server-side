@@ -42,6 +42,12 @@ async function run() {
       res.send(tools);
     });
 
+    app.post('/tools', async (req, res) => {
+      const newTools = req.body;
+      const result = await toolsCollection.insertOne(newTools);
+      res.send(result);
+  })
+
     app.get('/admin/:email', async (req, res) => {
       const email = req.params.email;
       const user = await userCollection.findOne({email:email})
