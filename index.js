@@ -34,6 +34,7 @@ async function run() {
     const reviewCollection = client.db("products").collection('reviews');
     const userCollection = client.db("products").collection('users');
     const userInfoCollection = client.db("products").collection('usersInfo');
+    const orderCollection = client.db("products").collection('orders');
 
     app.get('/tools', async (req, res) => {
       const query = {};
@@ -46,13 +47,19 @@ async function run() {
       const newTools = req.body;
       const result = await toolsCollection.insertOne(newTools);
       res.send(result);
-  })
+    })
+
+    app.post('/order', async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
+      res.send(result);
+    })
 
     app.get('/admin/:email', async (req, res) => {
       const email = req.params.email;
-      const user = await userCollection.findOne({email:email})
-      const isAdmin =  user.role === 'admin';
-      res.send({admin:isAdmin});
+      const user = await userCollection.findOne({ email: email })
+      const isAdmin = user.role === 'admin';
+      res.send({ admin: isAdmin });
     })
 
     app.put('/user/:email', async (req, res) => {
@@ -118,7 +125,7 @@ async function run() {
       res.send(tool);
     })
 
-    app.get('/purchase/:id', verifyJWT, async (req, res) => {
+    app.get('/purchase/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const tool = await toolsCollection.findOne(query);
