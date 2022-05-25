@@ -49,6 +49,14 @@ async function run() {
       res.send(result);
     })
 
+     // individual Order
+     app.get('/booking',async(req,res)=>{
+        const email = req.query.email;
+        const query = {email:email};
+        const bookings = await orderCollection.find(query).toArray();
+        res.send(bookings);
+     })
+
     app.post('/order', async (req, res) => {
       const order = req.body;
       const result = await orderCollection.insertOne(order);
