@@ -50,18 +50,21 @@ async function run() {
     })
 
      // individual Order
-     app.get('/booking',async(req,res)=>{
+     app.get('/order',async(req,res)=>{
         const email = req.query.email;
         const query = {email:email};
         const bookings = await orderCollection.find(query).toArray();
         res.send(bookings);
      })
 
-    app.post('/order', async (req, res) => {
-      const order = req.body;
-      const result = await orderCollection.insertOne(order);
-      res.send(result);
-    })
+     // get edit user
+     app.get('/booking',async(req,res)=>{
+       const email = req.query.email;
+       const query = {email:email};
+       const bookings = await userInfoCollection.find(query).toArray();
+       res.send(bookings);
+     })
+
 
     app.get('/admin/:email', async (req, res) => {
       const email = req.params.email;
@@ -99,39 +102,29 @@ async function run() {
       }
     })
 
-    app.post('/userInfo/:email', async (req, res) => {
-      const email = req.params.email;
-      const user = req.body;
-      const filter = { email: email };
-      const options = { upsert: true };
-      const updateDoc = {
-        $set: user,
-      };
-      const result = await userInfoCollection.updateOne(filter, updateDoc, options);
+    app.post('/order', async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
       res.send(result);
     })
-    // app.put('/userInfo/:email', async (req, res) => {
-    //   const email = req.params.email;
-    //   const user = req.body;
-    //   const filter = { email: email };
-    //   const options = { upsert: true };
-    //   const updateDoc = {
-    //     $set: user,
-    //   };
-    //   const result = await userInfoCollection.updateOne(filter, updateDoc, options);
-    //   res.send(result);
-    // })
+
+    app.post('/userInfo', async (req, res) => {
+      const info = req.body;
+      const result = await userInfoCollection.insertOne(info);
+      res.send(result);
+    })
+
     app.get('/user', async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     })
 
-    app.get('/userInfo/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { email: email };
-      const tool = await toolsCollection.findOne(query);
-      res.send(tool);
-    })
+    // app.get('/userInfo/:email', async (req, res) => {
+    //   const email = req.params.email;
+    //   const query = { email: email };
+    //   const tool = await toolsCollection.findOne(query);
+    //   res.send(tool);
+    // })
 
     app.get('/purchase/:id', async (req, res) => {
       const id = req.params.id;
