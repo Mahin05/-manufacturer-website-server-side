@@ -49,17 +49,17 @@ async function run() {
       }
     }
 
-    app.post('/create-payment-intent', verifyJWT, async(req, res) =>{
+    app.post('/create-payment-intent', verifyJWT, async (req, res) => {
       const toolName = req.body;
       const pricePerunit = toolName.pricePerunit;
-      const amount = pricePerunit*100;
+      const amount = pricePerunit * 100;
       const paymentIntent = await stripe.paymentIntents.create({
-        amount : amount,
+        amount: amount,
         currency: 'usd',
-        payment_method_types:['card']
+        payment_method_types: ['card']
       });
-      res.send({clientSecret: paymentIntent.client_secret})
-      });
+      res.send({ clientSecret: paymentIntent.client_secret })
+    });
 
     app.get('/tools', async (req, res) => {
       const query = {};
@@ -75,15 +75,33 @@ async function run() {
     })
 
     // individual Order
-    app.get('/booking',async(req,res)=>{
-      const email= req.query.email;
-      const query = {email:email};
+    app.get('/booking', async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
       const bookings = await orderCollection.find(query).toArray();
       res.send(bookings)
     })
+    // app.get('/edituser',async(req,res)=>{
+    //   const email= req.query.email;
+    //   const query = {email:email};
+    //   const bookings = await userInfoCollection.find(query).toArray();
+    //   res.send(bookings)
+    // })
+
+    // app.put('/edituser',async(req,res)=>{
+    //   const email= req.query.email;
+    //   updatedUser = req.body;
+    //   const query = {email:email};
+    //   const options = {upsert:true}
+    //   const updatedDoc = {
+    //     $set:updatedUser
+    //   }
+    //   const bookings = await userInfoCollection.updateOne(query,updatedDoc,options)
+    //   res.send(bookings)
+    // })
 
 
-    app.get('/order/:id',verifyJWT, async (req, res) => {
+    app.get('/order/:id', verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const order = await orderCollection.findOne(query);
@@ -179,7 +197,7 @@ async function run() {
     })
 
 
-    app.put('/user/admin/:email', verifyJWT,verifyAdmin, async (req, res) => {
+    app.put('/user/admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
       const email = req.params.email;
 
       const filter = { email: email };
@@ -196,22 +214,40 @@ async function run() {
       res.send(result);
     })
 
-    app.post('/userInfo', async (req, res) => {
+    // app.put('/edituser',async(req,res)=>{
+    //   const email= req.query.email;
+    //   updatedUser = req.body;
+    //   const query = {email:email};
+    //   const options = {upsert:true}
+    //   const updatedDoc = {
+    //     $set:updatedUser
+    //   }
+    //   const bookings = await userInfoCollection.updateOne(query,updatedDoc,options)
+    //   res.send(bookings)
+    // })
+
+    app.post('/userInfo/:email', async (req, res) => {
+      const email = req.query.email;
       const info = req.body;
-      const result = await userInfoCollection.insertOne(info);
-      res.send(result);
+      const query = { email: email };
+      const options = { upsert: true }
+      const updatedDoc = {
+        $set: info
+      }
+      const bookings = await userInfoCollection.updateOne(query, updatedDoc, options)
+      res.send(bookings);
     })
+
 
     app.get('/user', verifyJWT, async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     })
 
-    app.get('/userInfo/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { email: email };
-      const tool = await toolsCollection.findOne(query);
-      res.send(tool);
+    app.post('/userInfo', async (req, res) => {
+      const info = req.body;
+      const result = await userInfoCollection.insertOne(info);
+      res.send(result);
     })
 
     app.get('/purchase/:id', async (req, res) => {
@@ -232,16 +268,16 @@ async function run() {
       const reviews = await cursor.toArray();
       res.send(reviews);
     })
-    app.get('/allorders',async(req,res)=>{
+    app.get('/allorders', async (req, res) => {
       const query = {};
       const cursor = orderCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     })
-    app.patch('/booking/:id', verifyJWT, async(req, res) =>{
-      const id  = req.params.id;
+    app.patch('/booking/:id', verifyJWT, async (req, res) => {
+      const id = req.params.id;
       const payment = req.body;
-      const filter = {_id: ObjectId(id)};
+      const filter = { _id: ObjectId(id) };
       const updatedDoc = {
         $set: {
           paid: true,
