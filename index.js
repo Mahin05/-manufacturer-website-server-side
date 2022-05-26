@@ -120,6 +120,13 @@ async function run() {
       const result = await orderCollection.deleteOne(query);
       res.send(result);
     })
+    app.delete('/tool/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await toolsCollection.deleteOne(query);
+      res.send(result);
+    })
+
     app.delete('/cancel/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
